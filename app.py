@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from typing import Optional
 import inferless
 import torch
-from transformers import AutoProcessor, Gemma3ForConditionalGeneration
+from transformers import AutoTokenizer, Gemma3ForCausalLM
 
 @inferless.request
 class RequestObjects(BaseModel):
@@ -27,10 +27,10 @@ class InferlessPythonModel:
     def initialize(self):
         model_id = "google/gemma-3-1b-it"
         snapshot_download(repo_id=model_id, allow_patterns=["*.safetensors"])
-        self.model = Gemma3ForConditionalGeneration.from_pretrained(
+        self.model = Gemma3ForCausalLM.from_pretrained(
             model_id, device_map="cuda"
         ).eval()
-        self.processor = AutoProcessor.from_pretrained(model_id)
+        self.processor = AutoTokenizer.from_pretrained(model_id)
 
     def infer(self, request: RequestObjects) -> ResponseObjects:
         messages = [
